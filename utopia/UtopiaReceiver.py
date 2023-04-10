@@ -4,6 +4,8 @@ import socket
 import random
 import time
 
+from frame.frame import Packet, Frame
+
 RECEIVER_ADDR = ('localhost', 8025)
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -16,10 +18,11 @@ def receive():
     while True:
         pkt, addr = sock.recvfrom(1024)
         a_data = pickle.loads(pkt)
-        seq_no = a_data[0]
+        packet = Packet(a_data.data)
+        frame = Frame(packet)
 
-        print('Frame Received with seqNo: ', seq_no)
-        print('Content : ', a_data[1])
+        print('Frame Received with seqNo: ', frame.sequence_number)
+        print('Content : ', frame.data)
         print('------------------------------------------------------------------')
         # break
 
