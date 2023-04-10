@@ -4,7 +4,19 @@ import random
 import pickle
 from tkinter import *
 
-from timer import Timer
+from timer.timer import Timer
+
+class Packet:
+    def __init__(self, data):
+        self.data = data
+
+class Frame:
+    def __init__(self, packet):
+        self.type = 'frame'
+        self.sequence_number = random.randint(0, 999)
+        self.confirmation_number = packet.sequence_number
+        self.data = packet.data
+
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 RECEIVER_ADDR = ('localhost', 8025)

@@ -1,6 +1,6 @@
 import socket
 import pickle
-import time
+import timer.timer
 
 RECEIVER_ADDR = ('localhost', 8025)
 SENDER_ADDR = ('localhost', 8000)
