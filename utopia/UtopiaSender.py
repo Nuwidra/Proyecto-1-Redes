@@ -3,6 +3,8 @@ import time
 import random
 import pickle
 from tkinter import *
+
+from events.events import *
 from frame.frame import Packet, Frame
 from timer.timer import Timer
 
@@ -42,8 +44,10 @@ def send():
         while not canSend:
             packet = Packet(data)
             frame = Frame(packet)
+            from_network_layer(packet)
             sock.sendto(pickle.dumps(frame), RECEIVER_ADDR)
             canSend = True
+            to_physical_layer(frame)
 
         pickle.dump(tkinter_status, f)
         no_of_frames -= 1
@@ -55,4 +59,3 @@ def send():
 
 send()
 sock.close()
-
