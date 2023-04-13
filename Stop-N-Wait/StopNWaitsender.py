@@ -38,20 +38,18 @@ def send():
     no_of_frames = int(input('Enter No of frames to be sent : '))
 
     while no_of_frames > 0:
-
         canSend = False
-        data = input('Enter Data to be trasffered to client : ')
+        data = input('Enter Data to be transferred to client : ')
         tkinter_status = []
         tkinter_status.extend([seqNo, data])
         while not canSend:
-            packet = []
-            rand_no = random.randint(1, 4)
-            from_physical_layer(packet)
-            to_network_layer(packet)
-            to_physical_layer(packet)
-            packet.extend([seqNo, data, rand_no])
-            sock.sendto(pickle.dumps(packet), ('localhost', 8025))
+            packet = Packet(data)
+            frame = Frame(packet)
+            frame.sequence_number = seqNo
+            to_physical_layer(pickle.dumps(frame.__dict__))
             send_timer.start()
+
+            rand_no = random.randint(1, 4)
 
             if rand_no == 1:
                 ##Frame becomes corrupted
