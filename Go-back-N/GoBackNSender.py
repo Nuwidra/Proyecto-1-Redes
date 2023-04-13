@@ -2,7 +2,7 @@ import socket
 import random
 import pickle
 import time
-
+from events.events import *
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 RECEIVER_ADDR = ('localhost', 8025)
 SENDER_ADDR = ('localhost', 8000)
@@ -43,7 +43,7 @@ def sender() :
     file.seek(0)
     file.truncate(0)
     #-------------------------------------------------------------
-    
+    enable_network_layer()
     ch = 'y'
     print(f'\33]0;GoBackN Sender\a', end = '', flush = True)
     
@@ -53,17 +53,20 @@ def sender() :
         arr1 = []
         packet = []
         j = 0
-
+        to_physical_layer(packet)
         if tot_frames - size < 4 :
+            from_network_layer(packet)
             frame_send_at_instance = tot_frames - size
             
         for i in range(sw,(sw+frame_send_at_instance)) :
+            to_network_layer(packet)
             arr1.append(arr[i])
             j += 1
             tkinter_status.append(arr[i])
         
         print("--------------------------------------------------------------------------------")
         for i in range(j) :
+            from_network_layer(packet)
             print("Frame  ",arr1[i]," is sent")
         print("--------------------------------------------------------------------------------")
             
@@ -74,7 +77,8 @@ def sender() :
         sock.sendto(pickle.dumps(packet),('localhost',8025))
 
         if f != 5 :
-            
+            from_network_layer(packet)
+            from_physical_layer(packet)
             ack,_ = sock.recvfrom(1024)
             ack = pickle.loads(ack)
             rw = int(ack[0])
@@ -104,6 +108,7 @@ def sender() :
                     sw = ( sw + frame_send_at_instance) % m
                     size += 4
             else :
+                to_network_layer(packet)
                 sw = ( sw + frame_send_at_instance) % m
                 print("--------------------------------------------------------------------------------")
                 print("All Four Frames are Acknowledged")
@@ -112,6 +117,7 @@ def sender() :
                 tkinter_status.append(["Acknowledgement Received","All"])
 
         else :
+            to_network_layer(packet)
             ack,_ = sock.recvfrom(1024)
             ack = pickle.loads(ack)
             rw = int(ack[0])
@@ -139,7 +145,9 @@ def sender() :
         pickle.dump(tkinter_status,file)
         ch = input('Send Again(y/n) : ')
         if ch != 'y':
+            enable_network_layer()
             break
+    disable_network_layer();
     file.close()
     time.sleep(2)
 sender()

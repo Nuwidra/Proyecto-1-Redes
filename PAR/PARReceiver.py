@@ -1,5 +1,6 @@
 import socket
 import pickle
+from events.events import *
 
 RECEIVER_ADDR = ('localhost', 8025)
 
@@ -15,6 +16,7 @@ while True:
     data = packet[1]
 
     if seq_no == expected_seq_no:
+        from_physical_layer(packet)
         # received expected packet
         print(f"Received: {data}")
         # send ACK
@@ -22,6 +24,7 @@ while True:
         sock.sendto(pickle.dumps(ack_packet), ('localhost', 8000))
         # increment expected sequence number
         expected_seq_no = (expected_seq_no + 1) % 2
+        to_physical_layer(packet)
     else:
         # received out-of-order packet, discard and wait for retransmission
         print(f"Discarding out-of-order packet with seq_no: {seq_no}")

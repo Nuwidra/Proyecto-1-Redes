@@ -3,8 +3,9 @@ import time
 import random
 import pickle
 from tkinter import *
-
-from timer import Timer
+from events.events import *
+from frame.frame import Packet, Frame
+from timer.timer import Timer
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 RECEIVER_ADDR = ('localhost', 8025)
@@ -45,7 +46,9 @@ def send():
         while not canSend:
             packet = []
             rand_no = random.randint(1, 4)
-
+            from_physical_layer(packet)
+            to_network_layer(packet)
+            to_physical_layer(packet)
             packet.extend([seqNo, data, rand_no])
             sock.sendto(pickle.dumps(packet), ('localhost', 8025))
             send_timer.start()

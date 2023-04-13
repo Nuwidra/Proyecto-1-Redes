@@ -3,7 +3,7 @@ import sys
 import socket
 import random
 import time
-
+from events.events import *
 RECEIVER_ADDR = ('localhost', 8025)
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -16,9 +16,10 @@ def receive():
     while True:
         pkt, addr = sock.recvfrom(1024)
         a_data = pickle.loads(pkt)
+        from_network_layer(a_data)
         seq_no = a_data[0]
         rand = a_data[2]
-
+        to_physical_layer(a_data)
         if rand == 4:
             print('Frame Received with seqNo: ', seq_no)
             pkt = (int(seq_no) + 1) % 2
