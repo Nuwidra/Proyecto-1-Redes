@@ -44,12 +44,12 @@ def send():
         tkinter_status = []
         tkinter_status.extend([seqNo, data])
         while not canSend:
-            packet = []
+            packet = Packet(data)
             rand_no = random.randint(1, 4)
+            frame = Frame(packet)
             from_physical_layer(packet)
             to_network_layer(packet)
             to_physical_layer(packet)
-            packet.extend([seqNo, data, rand_no])
             sock.sendto(pickle.dumps(packet), ('localhost', 8025))
             send_timer.start()
 
@@ -111,4 +111,3 @@ def send():
 
 send()
 sock.close()
-
