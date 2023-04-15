@@ -6,142 +6,111 @@ from events.events import *
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 RECEIVER_ADDR = ('localhost', 8025)
 SENDER_ADDR = ('localhost', 8000)
-
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(SENDER_ADDR)
-
-#----------------------------------------------------------
-
-tot_frames = 16
-n = 3
-m = pow(2,n)
-t = 0
-frame_send_at_instance = m // 2
-sw = 0
-rw = 0
-arr1 = []
-arr = []
-size = 0
-
-for i in range(tot_frames) :
-    arr.append(t)
-    t = (t+1) % m
-#print(arr)
-#----------------------------------------------------------
-
 tkinter_status = []
+tot_frames = 16
+window_size = 3
+total_number_of_frames = pow(2, window_size)
+frame_number = 0
+frame_send_at_instance = total_number_of_frames // 2
+send_window = 0
+receive_window = 0
+array_to_store_the_frames_to_be_sent = []
+array_to_store = []
+size_of_the_array = 0
+for i in range(tot_frames) :
+    array_to_store.append(frame_number)
+    frame_number = (frame_number + 1) % total_number_of_frames
 def sender() :
-    global m
-    global sw,size
-    global rw
+    global total_number_of_frames
+    global send_window,size_of_the_array
+    global receive_window
     global frame_send_at_instance
-    global arr,total_frames
-    global arr1
-
-    #------------------------------------------------------------
+    global array_to_store,total_frames
+    global array_to_store_the_frames_to_be_sent
     file = open("l.txt","ab")
     file.seek(0)
     file.truncate(0)
-    #-------------------------------------------------------------
     enable_network_layer()
     ch = 'y'
-    print(f'\33]0;GoBackN Sender\a', end = '', flush = True)
-    
-    while ch == 'y' and size < tot_frames :
-        
+    print(f'GoBackN Sender', end = '', flush = True)
+    while ch == 'y' and size_of_the_array < tot_frames :
         tkinter_status = []
-        arr1 = []
+        array_to_store_the_frames_to_be_sent = []
         packet = []
         j = 0
         to_physical_layer(packet)
-        if tot_frames - size < 4 :
+        if tot_frames - size_of_the_array < 4 :
             from_network_layer(packet)
-            frame_send_at_instance = tot_frames - size
-            
-        for i in range(sw,(sw+frame_send_at_instance)) :
+            frame_send_at_instance = tot_frames - size_of_the_array
+        for i in range(send_window, (send_window + frame_send_at_instance)):
             to_network_layer(packet)
-            arr1.append(arr[i])
+            array_to_store_the_frames_to_be_sent.append(array_to_store[i])
             j += 1
-            tkinter_status.append(arr[i])
-        
-        print("--------------------------------------------------------------------------------")
+            tkinter_status.append(array_to_store[i])
         for i in range(j) :
             from_network_layer(packet)
-            print("Frame  ",arr1[i]," is sent")
+            print("Frame  ", array_to_store_the_frames_to_be_sent[i], " is sent")
         print("--------------------------------------------------------------------------------")
-            
-        f = random.randint(0,9)
-        f1 = random.randint(0,frame_send_at_instance-1)
-        
-        packet.extend([m,frame_send_at_instance,arr1,rw,f,f1])
+        random_initial = random.randint(0,9)
+        random_frame_instance = random.randint(0,frame_send_at_instance-1)
+        packet.extend([total_number_of_frames, frame_send_at_instance, array_to_store_the_frames_to_be_sent, receive_window, random_initial, random_frame_instance])
         sock.sendto(pickle.dumps(packet),('localhost',8025))
-
-        if f != 5 :
+        if random_initial != 5 :
             from_network_layer(packet)
             from_physical_layer(packet)
             ack,_ = sock.recvfrom(1024)
             ack = pickle.loads(ack)
-            rw = int(ack[0])
+            receive_window = int(ack[0])
             a1 = int(ack[1])
             if a1 >= 0 and a1 <= 3 :
-                for k in range(len(arr)) :
-                    if arr1[k] != arr1[a1] :
+                for k in range(len(array_to_store)) :
+                    if array_to_store_the_frames_to_be_sent[k] != array_to_store_the_frames_to_be_sent[a1] :
+                        print("Acknowledgement of Frame", array_to_store_the_frames_to_be_sent[k], " is recieved")
                         print("--------------------------------------------------------------------------------")
-                        print("Acknowledgement of Frame",arr1[k]," is recieved")
-                        
                     else :
                         break
+                print("Acknowledgement of Frame ", array_to_store_the_frames_to_be_sent[a1], " is lost")
                 print("--------------------------------------------------------------------------------")
-                print("Acknowledgement of Frame ",arr1[a1]," is lost")
-                print("--------------------------------------------------------------------------------")
-                tkinter_status.append(["Acknowledgement Lost",arr1[a1]])
-                temp = (sw + frame_send_at_instance) % m
+                tkinter_status.append(["Acknowledgement Lost", array_to_store_the_frames_to_be_sent[a1]])
+                temp = (send_window + frame_send_at_instance) % total_number_of_frames
                 comp = 0
                 if (temp == 0) :
                     comp = 7
-
-                if int(arr1[a1]) == comp or int(arr1[a1]) == temp-1:
-                    sw = (sw + 3) % m
-                    size += 3
-
+                if int(array_to_store_the_frames_to_be_sent[a1]) == comp or int(array_to_store_the_frames_to_be_sent[a1]) == temp-1:
+                    send_window = (send_window + 3) % total_number_of_frames
+                    size_of_the_array += 3
                 else :
-                    sw = ( sw + frame_send_at_instance) % m
-                    size += 4
+                    send_window = (send_window + frame_send_at_instance) % total_number_of_frames
+                    size_of_the_array += 4
             else :
                 to_network_layer(packet)
-                sw = ( sw + frame_send_at_instance) % m
-                print("--------------------------------------------------------------------------------")
+                send_window = (send_window + frame_send_at_instance) % total_number_of_frames
                 print("All Four Frames are Acknowledged")
                 print("--------------------------------------------------------------------------------")
-                size += 4
+                size_of_the_array += 4
                 tkinter_status.append(["Acknowledgement Received","All"])
-
         else :
             to_network_layer(packet)
             ack,_ = sock.recvfrom(1024)
             ack = pickle.loads(ack)
-            rw = int(ack[0])
-            f1 = int(ack[1])
+            receive_window = int(ack[0])
+            random_frame_instance = int(ack[1])
             ld = random.randint(0,1)
-
             if ld == 0 :
-                print("--------------------------------------------------------------------------------")
-                print("Frame ",arr1[f1]," is damaged.")
-                tkinter_status.append(["Frame Damaged",arr1[f1]])
+                print("Frame ", array_to_store_the_frames_to_be_sent[random_frame_instance], " is damaged.")
+                tkinter_status.append(["Frame Damaged", array_to_store_the_frames_to_be_sent[random_frame_instance]])
                 print("--------------------------------------------------------------------------------")
             else :
+                print("Frame ", array_to_store_the_frames_to_be_sent[random_frame_instance], " is lost")
+                tkinter_status.append(["Frame Lost", array_to_store_the_frames_to_be_sent[random_frame_instance]])
                 print("--------------------------------------------------------------------------------")
-                print("Frame ",arr1[f1]," is lost")
-                tkinter_status.append(["Frame Lost",arr1[f1]])
-                print("--------------------------------------------------------------------------------")
-                    
-            for i in range(f1+1,frame_send_at_instance) :
-                print("Frame ",arr1[i]," is discarded")
-            print("--------------------------------------------------------------------------------")
+            for i in range(random_frame_instance+1,frame_send_at_instance) :
+                print("Frame ", array_to_store_the_frames_to_be_sent[i], " is discarded")
             print("-------------TIMEOUT-------------")
             tkinter_status.append(["Timeout","All"])
-            sw = arr1[f1]
-
+            send_window = array_to_store_the_frames_to_be_sent[random_frame_instance]
         pickle.dump(tkinter_status,file)
         ch = input('Send Again(y/n) : ')
         if ch != 'y':
