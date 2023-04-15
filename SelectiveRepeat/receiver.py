@@ -1,14 +1,12 @@
 import socket, pickle
-
+import threading, pickle, socket, time, random
 import SelectiveRepeat
 from SelectiveRepeat.frame import Frame, Kind
 
 BUFFER_SIZE = 8192
 BUFFER_FRAME_SIZE = 0
-
 BUFFER_FRAME = []
 EXPECTED_SEQUENCE_NUMBER = 0
-
 receiverSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 host = socket.gethostname()
 portA = 4004

@@ -14,8 +14,8 @@ SENDER_ADDR = ('localhost', 8000)
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(SENDER_ADDR)
 
-TIMEOUT_INTERVAL = 0.5
-SLEEP_INTERVAL = 0.05
+TIMEOUT_INTERVAL = float(input('Ingrese la probabildad de TIMEOUT_INTERVAL: ')) # 0.5
+SLEEP_INTERVAL = float(input('Ingrese la probabildad de SLEEP_INTERVAL: ')) # 0.05
 
 send_timer = Timer(TIMEOUT_INTERVAL)
 
