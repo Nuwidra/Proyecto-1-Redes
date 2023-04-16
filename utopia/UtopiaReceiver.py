@@ -2,7 +2,7 @@ import pickle
 import socket
 from events.events import *
 from frame.frame import Packet, Frame
-RECEIVER_ADDR = ('localhost', 8025)
+RECEIVER_ADDR = ('localhost', 8026)
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(RECEIVER_ADDR)
 

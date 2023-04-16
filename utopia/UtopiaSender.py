@@ -6,8 +6,8 @@ from events.events import *
 from frame.frame import Packet, Frame
 from timer.timer import Timer
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-RECEIVER_ADDR = ('localhost', 8025)
-SENDER_ADDR = ('localhost', 8000)
+RECEIVER_ADDR = ('localhost', 8026)
+SENDER_ADDR = ('localhost', 8030)
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(SENDER_ADDR)
 

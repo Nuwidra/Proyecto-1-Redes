@@ -1,9 +1,18 @@
 import pickle
+import socket
 from SelectiveRepeat.frame import Frame, Packet
-from variables_receiver import *
+
+receiver_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+host = socket.gethostname()
+portA = 8004
+portB = 8006
+receiver_socket.bind(('', portB))
+
 def receiver(window_size=7):
-    global expected_seq_num
-    global frame_size
+    total_size = 8192
+    frame_size = 0
+    frame_list = []
+    expected_seq_num = 0
     frame_size = (window_size + 1) / 2
     while True:
         try:
@@ -26,9 +35,16 @@ def receiver(window_size=7):
                     frame_list) < frame_size:
                 if not frame_was_obtained.packet == Packet.CKSUM_ERR:
                     print("Info: ", frame_was_obtained.packetInfo)
+
+
                     frame_list.append(frame_was_obtained)
                     print("Frame esperado: ", expected_seq_num)
                     receiver_socket.sendto(pickle.dumps(sequence_number), (host, portA))
         except Exception as e:
             print("FATAL ERROR WITH THE FRAME")
-receiver()
+
+def stop_receiver():
+    receiver_socket.close()
+
+if __name__ == '__main__':
+    receiver()

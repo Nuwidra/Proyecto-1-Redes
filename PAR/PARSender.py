@@ -2,13 +2,13 @@ import socket
 import pickle
 from events.events import *
 from frame.frame import Frame, Packet
-RECEIVER_ADDR = ('localhost', 8025)
-SENDER_ADDR = ('localhost', 8000)
+RECEIVER_ADDR = ('localhost',8009)
+SENDER_ADDR = ('localhost', 8001)
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(SENDER_ADDR)
-def send_data():
-    num_frames = int(input("Enter the number of frames to send: "))
-    data = input("Enter the data to send: ")
+
+
+def send_data(num_frames,data):
     packet = Packet(data)
     seq_no = 0
     for i in range(num_frames):
@@ -19,7 +19,7 @@ def send_data():
         start_timer(frame.sequence_number)
         # wait for ACK
         while True:
-            ack_packet, addr = sock.recvfrom(1024)
+            ack_packet, addr = sock.recvfrom(1025)
             ack = pickle.loads(ack_packet)
             if isinstance(ack, Frame) and ack.confirmation_number == seq_no:
                 print(f"Received ACK with seqNo={ack.confirmation_number}")
@@ -30,6 +30,6 @@ def send_data():
     end_frame = Frame(Packet(""))
     end_frame.sequence_number = seq_no
     sock.sendto(pickle.dumps(end_frame), RECEIVER_ADDR)
+
+def stop_sender():
     sock.close()
-send_data()
-sock.close()

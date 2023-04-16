@@ -9,6 +9,7 @@ SENDER_ADDR = ('localhost', 8000)
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(SENDER_ADDR)
 tkinter_status = []
+
 tot_frames = 16
 window_size = 3
 total_number_of_frames = pow(2, window_size)
@@ -22,6 +23,8 @@ size_of_the_array = 0
 for i in range(tot_frames) :
     array_to_store.append(frame_number)
     frame_number = (frame_number + 1) % total_number_of_frames
+
+
 def sender() :
     global total_number_of_frames
     global send_window,size_of_the_array

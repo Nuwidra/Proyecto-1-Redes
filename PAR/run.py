@@ -1,23 +1,22 @@
-from threading import Thread
-from UtopiaSender import send, stop as stop_sender
-from UtopiaReceiver import receive, stop as stop_receiver
 
-# Modify these values as desired
-TIMEOUT_INTERVAL = 0.5
-SLEEP_INTERVAL = 0.05
-NO_OF_FRAMES = 3
-DATA = "Hello, Utopia!"
+import threading
+from PAR.PARReceiver import receive_data, stop_receiver
+from PAR.PARSender import send_data, stop_sender
+
+# Define the data to be sent
+data = "Hello, world!"
+frame = 5
 
 # Start receiver in a separate thread
-receiver_thread = Thread(target=receive)
+receiver_thread = threading.Thread(target=receive_data)
 receiver_thread.start()
 
 # Start sender
-send_thread = Thread(target=send, args=(TIMEOUT_INTERVAL, SLEEP_INTERVAL, NO_OF_FRAMES, DATA))
-send_thread.start()
+sender_thread = threading.Thread(target=send_data, args=(frame, data))
+sender_thread.start()
 
 # Wait for sender to finish
-send_thread.join()
+sender_thread.join()
 
 # Stop the receiver with error handling oserror if the socket is already closed by the sender
 try:
