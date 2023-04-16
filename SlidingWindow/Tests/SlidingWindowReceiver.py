@@ -25,30 +25,33 @@ timers = map(lambda t: Timer(3, timeout, args=[
 
 # define receiver
 def receiver():
-    sl, su, sw = 0, 0, 4  # su:frame sl:contador
-    rcvd = [False] * len(data)  # Matriz para almacenar si se ha recibido una trama con los datos
+    sl, su, sw = 0, 0, 4
+    rcvd = [None] * len(data)
     while sl < len(data):
         try:
             if su < sl + sw and su < len(data):
                 print("Enviando ", su)
-                # Solo 80%  de la solicitudes es reenviado, esto para tener el canal con ruido
                 if random() < 0.8:
+                    packet = Packet(su, data[su])
+                    frame = Frame(packet, time.time())
                     sock.send(str(su) + "," + data[su])
+                    timers[su] = frame
                 else:
                     print("Frame ", su, " perdido en la transmisión")
-                timers[su].start()
                 su += 1
             sleep(0.5)
             ack = sock.recv(1024)
             if ack is not None:
-                ack = int(ack.split(",")[0])
-                print("ACK", ack)
-                if ack >= sl and ack < su:  # Comprobar la validez de ACK (acknowledgemen o acuse de recibo)
-                    rcvd[ack] = True
-                    print("Temporizador cancelado ", ack)
-                    timers[ack].cancel()  # Cancela el temporizador
-                    if ack == sl:
-                        while rcvd[sl]:  # Incrementa el SL
+                ack_seq_num = int(ack.split(",")[0])
+                print("ACK", ack_seq_num)
+                if rcvd[ack_seq_num] is None:
+                    rcvd[ack_seq_num] = Packet(ack_seq_num, None)
+                if ack_seq_num >= sl and ack_seq_num < su:
+                    rcvd[ack_seq_num] = Packet(ack_seq_num, None)
+                    print("Temporizador cancelado ", ack_seq_num)
+                    timers[ack_seq_num].cancel()
+                    if ack_seq_num == sl:
+                        while rcvd[sl] is not None:
                             sl += 1
                             print("SL se incrementa ", sl)
         except Exception as e:
