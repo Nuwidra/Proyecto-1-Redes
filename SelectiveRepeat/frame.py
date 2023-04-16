@@ -1,16 +1,16 @@
 from enum import Enum
-class Kind(Enum):
-    DATA = 1
+class Packet(Enum):
+    data = 1
     ACK = 2
     CKSUM_ERR = 3
 class Frame:
-    kind = Kind
+    packet = Packet
     sequenceNumber = 0
     confirmationNumber = 0
     packetInfo = ""
 
-    def __init__(self, kind, sequenceNumber, confirmationNumber, packetInfo):
-        self.kind = kind
+    def __init__(self, packet, sequenceNumber, confirmationNumber, packetInfo):
+        self.packet = packet
         self.sequenceNumber = sequenceNumber
         self.confirmationNumber = confirmationNumber
         self.packetInfo = packetInfo

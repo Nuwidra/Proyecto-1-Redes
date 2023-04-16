@@ -49,7 +49,7 @@ def retry_send(frameToSend):
     if frameToSend.sequenceNumber not in frames_without_confirmation:
         lock.release()
         return
-    frameToSend.kind = random.choice(frame_type)
+    frameToSend.packet = random.choice(frame_type)
     print("\nSending Again: ", frameToSend.sequenceNumber)
     serialized_frame = pickle.dumps(frameToSend)
     try:
