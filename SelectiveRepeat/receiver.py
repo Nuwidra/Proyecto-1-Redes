@@ -1,55 +1,34 @@
-import socket, pickle
-import threading, pickle, socket, time, random
-import SelectiveRepeat
+import pickle
 from SelectiveRepeat.frame import Frame, Kind
-
-BUFFER_SIZE = 8192
-BUFFER_FRAME_SIZE = 0
-BUFFER_FRAME = []
-EXPECTED_SEQUENCE_NUMBER = 0
-receiverSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-host = socket.gethostname()
-portA = 4004
-portB = 4006
-receiverSocket.bind(('', portB))
-
-#it simulates the receiver function in selective repetitive protocol
-def receiverSelectiveRepetitive(windowSize=7):
-    global EXPECTED_SEQUENCE_NUMBER
-    global BUFFER_FRAME_SIZE
-    BUFFER_FRAME_SIZE = (windowSize + 1) / 2
-    
+from variables_receiver import *
+def receiver(window_size=7):
+    global expected_seq_num
+    global frame_size
+    frame_size = (window_size + 1) / 2
     while True:
-        frameObtained = Frame(0, "", "", "")
-
         try:
-            frameObtained, _ =  receiverSocket.recvfrom(BUFFER_SIZE)
-            frameObtained = pickle.loads(frameObtained)
-            
-            sequenceNumber = frameObtained.sequenceNumber
-            print("\nProcesando: ", sequenceNumber)
-            
-            if EXPECTED_SEQUENCE_NUMBER == sequenceNumber and not frameObtained.kind == Kind.CKSUM_ERR:
-                print("Info: ", frameObtained.packetInfo)
-                receiverSocket.sendto(pickle.dumps(sequenceNumber), (host, portA))
-                
-                EXPECTED_SEQUENCE_NUMBER += 1
-                
-                if len(BUFFER_FRAME) > 0:
-                    print("Frames en el Buffer: ", [item.sequenceNumber for item in BUFFER_FRAME])
-                    EXPECTED_SEQUENCE_NUMBER += len(BUFFER_FRAME)
-                    BUFFER_FRAME.clear() 
-                    print("Frame esperado: ", EXPECTED_SEQUENCE_NUMBER)
-                    
-            elif sequenceNumber >= EXPECTED_SEQUENCE_NUMBER - BUFFER_FRAME_SIZE/2 and sequenceNumber <= EXPECTED_SEQUENCE_NUMBER + BUFFER_FRAME_SIZE/2 and len(BUFFER_FRAME) < BUFFER_FRAME_SIZE:
-                if not frameObtained.kind == Kind.CKSUM_ERR:
-                    print("Info: ", frameObtained.packetInfo)
-                    BUFFER_FRAME.append(frameObtained)
-                    print("Frame esperado: ", EXPECTED_SEQUENCE_NUMBER)
-                    receiverSocket.sendto(pickle.dumps(sequenceNumber), (host, portA))
-            
-            print("____________________________")
+            frame_was_obtained, _ = receiver_socket.recvfrom(total_size)
+            frame_was_obtained = pickle.loads(frame_was_obtained)
+            sequence_number = frame_was_obtained.sequenceNumber
+            print("\nProcesando: ", sequence_number)
+            if expected_seq_num == sequence_number and not frame_was_obtained.kind == Kind.CKSUM_ERR:
+                print("Info: ", frame_was_obtained.packetInfo)
+                receiver_socket.sendto(pickle.dumps(sequence_number), (host, portA))
+                expected_seq_num += 1
+                if len(frame_list) > 0:
+                    print("Frames en el Buffer: ", [item.sequenceNumber for item in frame_list])
+                    expected_seq_num += len(frame_list)
+                    frame_list.clear()
+                    print("Frame expected: ", expected_seq_num)
+                else:
+                    print("No frame here")
+            elif sequence_number >= expected_seq_num - frame_size / 2 and sequence_number <= expected_seq_num + frame_size / 2 and len(
+                    frame_list) < frame_size:
+                if not frame_was_obtained.kind == Kind.CKSUM_ERR:
+                    print("Info: ", frame_was_obtained.packetInfo)
+                    frame_list.append(frame_was_obtained)
+                    print("Frame esperado: ", expected_seq_num)
+                    receiver_socket.sendto(pickle.dumps(sequence_number), (host, portA))
         except Exception as e:
-            print(e)
-
-receiverSelectiveRepetitive()
+            print("FATAL ERROR WITH THE FRAME")
+receiver()

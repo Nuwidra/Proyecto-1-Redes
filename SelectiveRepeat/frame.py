@@ -8,6 +8,7 @@ class Frame:
     sequenceNumber = 0
     confirmationNumber = 0
     packetInfo = ""
+
     def __init__(self, kind, sequenceNumber, confirmationNumber, packetInfo):
         self.kind = kind
         self.sequenceNumber = sequenceNumber
