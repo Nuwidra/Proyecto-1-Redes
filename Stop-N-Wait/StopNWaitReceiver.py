@@ -2,9 +2,11 @@ import pickle
 import socket
 from events.events import *
 from frame.frame import Packet, Frame
+
 RECEIVER_ADDR = ('localhost', 8025)
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(RECEIVER_ADDR)
+
 def receive():
     print(f'StopNWait Reciever', end='', flush=True)
     while True:
@@ -31,5 +33,8 @@ def receive():
             print('------------------------------------------------------------------')
         else:
             break
-receive()
-sock.close()
+
+# close the socket
+def stop_receiver():
+    sock.close()
+

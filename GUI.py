@@ -1,17 +1,34 @@
-import tkinter as tk
+from tkinter import *
 
-class ConsoleGUI(tk.Frame):
-    def __init__(self, master=None):
-        self.master = master
-        super().__init__(master)
-        self.pack()
+menu_window = Tk()
 
-        self.console = tk.Text(self)
-        self.console.insert(tk.END, 'Esto es una interfaz grafica')
-        self.console.pack(expand=True, fill='both')
-        self.console.tag_configure('center', justify='center')
-        self.console.tag_add('center', 1.0, 'end')
+# set the title
+menu_window.title("Protocol Selector")
 
-root = tk.Tk()
-app = ConsoleGUI(master=root)
-app.mainloop()
+# set the size
+menu_window.geometry('300x100')
+
+# create buttons to select protocol
+sr_button = Button(menu_window, text="Selective Repeat")
+sr_button.grid(column=0, row=0)
+
+gbn_button = Button(menu_window, text="Go Back N")
+gbn_button.grid(column=1, row=0)
+
+utopia_button = Button(menu_window, text="Utopia")
+utopia_button.grid(column=2, row=0)
+
+# create button to exit
+exit_button = Button(menu_window, text="Exit", command=menu_window.destroy)
+exit_button.grid(column=1, row=1)
+
+# action to be performed when selective repeat button is clicked
+def sr_button_clicked():
+    menu_window.destroy()
+    import SelectiveRepeat.SRGUI    # import the GUI of selective repeat protocol
+
+
+
+
+# run the main menu window
+menu_window.mainloop()

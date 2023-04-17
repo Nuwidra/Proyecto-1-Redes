@@ -6,35 +6,28 @@ from tkinter import *
 from events.events import *
 from frame.frame import Packet, Frame
 from timer.timer import Timer
+
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 RECEIVER_ADDR = ('localhost', 8025)
 SENDER_ADDR = ('localhost', 8000)
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(SENDER_ADDR)
-TIMEOUT_INTERVAL = float(input('Ingrese la probabildad de TIMEOUT_INTERVAL: ')) # 0.5
-SLEEP_INTERVAL = float(input('Ingrese la probabildad de SLEEP_INTERVAL: ')) # 0.05
-send_timer = Timer(TIMEOUT_INTERVAL)
-frame_to_send = 0
-seqNo = 0
-tkinter_status = []
-def send():
+
+def send(TIMEOUT_INTERVAL, SLEEP_INTERVAL, no_of_frames, data):
     global sock
-    global send_timer
-    global frame_to_send
-    global seqNo
-    global tkinter_status
+    send_timer = Timer(TIMEOUT_INTERVAL)
+    frame_to_send = 0
+    seqNo = 0
     file = open("b.txt", "ab")
     file.seek(0)
     file.truncate(0)
     print(f'StopNWait Sender', end='', flush=True)
-    no_of_frames = int(input('Enter No of frames to be sent : '))
     while no_of_frames > 0:
         canSend = False
-        data = input('Enter Data to be trasffered to client : ')
         tkinter_status = []
         tkinter_status.extend([seqNo, data])
         while not canSend:
-            packet_ack = packet_ack(data)
+            packet_ack = Packet(data)
             rand_no = random.randint(1, 4)
             frame = Frame(packet_ack)
             from_physical_layer(packet_ack)
@@ -83,5 +76,7 @@ def send():
         no_of_frames -= 1
     file.close()
     time.sleep(10)
-send()
-sock.close()
+
+
+def stop_sender():
+    sock.close()

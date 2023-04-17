@@ -2,11 +2,13 @@ import socket
 import pickle
 import random
 from events.events import *
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
 RECEIVER_ADDR = ('localhost', 8025)
 SENDER_ADDR = ('localhost', 8000)
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(RECEIVER_ADDR)
+
+
 def receiver() :
     print(f'GoBackN Receiver', end = '', flush = True)
     while True :
@@ -48,5 +50,9 @@ def receiver() :
                     print("--------------------------------------------------------------------------------")
             packet.extend([rw,f1])
             sock.sendto(pickle.dumps(packet),addr)
-receiver()
-sock.close()
+
+
+# stop receiver
+def stop_receiver() :
+    disable_network_layer()
+    sock.close()
