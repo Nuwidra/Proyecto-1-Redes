@@ -9,7 +9,7 @@ sock.bind(RECEIVER_ADDR)
 
 def receive():
     print(f'StopNWait Reciever', end='', flush=True)
-    while True:
+    while True: # loop indefinitely, receiving packets and sending acknowledgments
         packet_connect_address, addr = sock.recvfrom(1024)
         data_loads = pickle.loads(packet_connect_address)
         packet = Packet(data_loads)
@@ -17,18 +17,18 @@ def receive():
         frame = Frame(packet)
         rand = packet.sequence_number
         to_physical_layer(frame)
-        if rand == 4:
+        if rand == 4: # if frame is in order, then
             print('Frame Received with seqNo: ', frame.sequence_number)
             packet_connect_address = (int(frame.sequence_number) + 1) % 2
             print('Acknowlegment ', packet_connect_address, ' sent')
             sock.sendto(bytes(str(packet_connect_address), 'utf-8'), ('localhost', 8000))
             print('------------------------------------------------------------------')
-        elif rand == 3:
+        elif rand == 3: # if frame is out of order, then
             print('Frame Received with seqNo: ', frame.sequence_number)
             packet_connect_address = 'Acknowledgement Lost'
             sock.sendto(bytes(str(packet_connect_address), 'utf-8'), ('localhost', 8000))
             print('------------------------------------------------------------------')
-        elif rand == 1 or rand == 2:
+        elif rand == 1 or rand == 2: # if frame is out of order, then
             print('No Frame Received')
             print('------------------------------------------------------------------')
         else:

@@ -23,17 +23,17 @@ def send(TIMEOUT_INTERVAL, SLEEP_INTERVAL, no_of_frames, data):
     file.seek(0)
     file.truncate(0)
     print(f'Utopia Sender', end='', flush=True)
-    while no_of_frames > 0:
+    while no_of_frames > 0: # while there are frames to be sent
         canSend = False
         tkinter_status = [seqNo, data]
-        while not canSend:
-            packet = Packet(data)
-            frame = Frame(packet)
-            from_network_layer(packet)
-            sock.sendto(pickle.dumps(frame), RECEIVER_ADDR)
-            canSend = True
+        while not canSend: # while the frame is not sent
+            packet = Packet(data) # create packet
+            frame = Frame(packet) # create frame
+            from_network_layer(packet) # send packet to network layer
+            sock.sendto(pickle.dumps(frame), RECEIVER_ADDR) # send frame to receiver
+            canSend = True # frame is sent
             to_physical_layer(frame)
-        pickle.dump(tkinter_status, file)
+        pickle.dump(tkinter_status, file) # write the status to file
         no_of_frames -= 1
         seqNo += 1
     file.close()

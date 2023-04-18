@@ -43,8 +43,8 @@ def senderLoop(array_to_store, ch, file, frame_send_at_instance, receive_window,
         array_to_store_the_frames_to_be_sent = []
         packet = []
         j = 0
-        to_physical_layer(packet)
-        if tot_frames - size_of_the_array < 4:
+        to_physical_layer(packet) # to_physical_layer() is a function that is called to send the frame to the physical layer
+        if tot_frames - size_of_the_array < 4: # if the number of frames to be sent is less than 4, then send all the frames
             from_network_layer(packet)
             frame_send_at_instance = tot_frames - size_of_the_array
         for i in range(send_window, (send_window + frame_send_at_instance)):
@@ -61,14 +61,14 @@ def senderLoop(array_to_store, ch, file, frame_send_at_instance, receive_window,
             [total_number_of_frames, frame_send_at_instance, array_to_store_the_frames_to_be_sent, receive_window,
              random_initial, random_frame_instance])
         sock.sendto(pickle.dumps(packet), ('localhost', 8025))
-        if random_initial != 5:
+        if random_initial != 5: # if the random number is not 5, then the acknowledgement is lost
             from_network_layer(packet)
             from_physical_layer(packet)
             ack, _ = sock.recvfrom(1024)
             ack = pickle.loads(ack)
             receive_window = int(ack[0])
             a1 = int(ack[1])
-            if a1 >= 0 and a1 <= 3:
+            if a1 >= 0 and a1 <= 3: # if the acknowledgement is not lost, then the acknowledgement is recieved
                 for k in range(len(array_to_store)):
                     if array_to_store_the_frames_to_be_sent[k] != array_to_store_the_frames_to_be_sent[a1]:
                         print("Acknowledgement of Frame", array_to_store_the_frames_to_be_sent[k], " is recieved")
@@ -79,32 +79,32 @@ def senderLoop(array_to_store, ch, file, frame_send_at_instance, receive_window,
                 print("--------------------------------------------------------------------------------")
                 temp = (send_window + frame_send_at_instance) % total_number_of_frames
                 comp = 0
-                if (temp == 0):
+                if (temp == 0): # if the frame is the last frame, then the next frame to be sent is 0
                     comp = 7
                 if int(array_to_store_the_frames_to_be_sent[a1]) == comp or int(
-                        array_to_store_the_frames_to_be_sent[a1]) == temp - 1:
+                        array_to_store_the_frames_to_be_sent[a1]) == temp - 1: # if the frame is the last frame, then the next frame to be sent is 0
                     send_window = (send_window + 3) % total_number_of_frames
                     size_of_the_array += 3
-                else:
+                else: # if the frame is not the last frame, then the next frame to be sent is the next frame
                     send_window = (send_window + frame_send_at_instance) % total_number_of_frames
                     size_of_the_array += 4
-            else:
+            else: # if the acknowledgement is lost, then the acknowledgement is not recieved
                 to_network_layer(packet)
                 send_window = (send_window + frame_send_at_instance) % total_number_of_frames
                 print("All Four Frames are Acknowledged")
                 print("--------------------------------------------------------------------------------")
                 size_of_the_array += 4
-        else:
+        else: # if the random number is 5, then the acknowledgement is damaged
             to_network_layer(packet)
             ack, _ = sock.recvfrom(1024)
             ack = pickle.loads(ack)
             receive_window = int(ack[0])
             random_frame_instance = int(ack[1])
             ld = random.randint(0, 1)
-            if ld == 0:
+            if ld == 0: # if the random number is 0, then the acknowledgement is damaged
                 print("Frame ", array_to_store_the_frames_to_be_sent[random_frame_instance], " is damaged.")
                 print("--------------------------------------------------------------------------------")
-            else:
+            else: # if the random number is 1, then the acknowledgement is lost
                 print("Frame ", array_to_store_the_frames_to_be_sent[random_frame_instance], " is lost")
                 print("--------------------------------------------------------------------------------")
             for i in range(random_frame_instance + 1, frame_send_at_instance):
@@ -113,7 +113,7 @@ def senderLoop(array_to_store, ch, file, frame_send_at_instance, receive_window,
             send_window = array_to_store_the_frames_to_be_sent[random_frame_instance]
         pickle.dump(packet, file)
         ch = input('Send Again(y/n) : ')
-        if ch != 'y':
+        if ch != 'y': # if the user does not want to send more frames, then the sender is disabled
             enable_network_layer()
             break
 

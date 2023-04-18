@@ -22,11 +22,11 @@ def send(TIMEOUT_INTERVAL, SLEEP_INTERVAL, no_of_frames, data):
     file.seek(0)
     file.truncate(0)
     print(f'StopNWait Sender', end='', flush=True)
-    while no_of_frames > 0:
+    while no_of_frames > 0: # while there are frames to be sent
         canSend = False
         tkinter_status = []
         tkinter_status.extend([seqNo, data])
-        while not canSend:
+        while not canSend: # while the frame is not sent
             packet_ack = Packet(data)
             rand_no = random.randint(1, 4)
             frame = Frame(packet_ack)
@@ -35,7 +35,7 @@ def send(TIMEOUT_INTERVAL, SLEEP_INTERVAL, no_of_frames, data):
             to_physical_layer(packet_ack)
             sock.sendto(pickle.dumps(packet_ack), ('localhost', 8025))
             send_timer.start()
-            if rand_no == 1:
+            if rand_no == 1: # if the frame is not corrupted
                 ##Frame becomes corrupted
                 print('Info : ', data)
                 print('Seq NO : ', seqNo)
@@ -44,7 +44,7 @@ def send(TIMEOUT_INTERVAL, SLEEP_INTERVAL, no_of_frames, data):
                 tkinter_status.append('Frame Lost')
                 send_timer.stop()
                 print('------------------------------------------------------------------')
-            elif rand_no == 2:
+            elif rand_no == 2: # if the frame is not corrupted
                 print('Info : ', data)
                 print('Seq NO : ', seqNo)
                 print('TimeOut')
@@ -52,7 +52,7 @@ def send(TIMEOUT_INTERVAL, SLEEP_INTERVAL, no_of_frames, data):
                 tkinter_status.append('Timeout')
                 send_timer.stop()
                 print('------------------------------------------------------------------')
-            elif rand_no == 3:
+            elif rand_no == 3: # if the frame is not corrupted
                 print('Info : ', data)
                 print('Seq NO : ', seqNo)
                 acknowledgement, _ = sock.recvfrom(1024)
@@ -61,7 +61,7 @@ def send(TIMEOUT_INTERVAL, SLEEP_INTERVAL, no_of_frames, data):
                 send_timer.stop()
                 tkinter_status.append('Acknowledgement Lost')
                 print('------------------------------------------------------------------')
-            elif rand_no == 4:
+            elif rand_no == 4: # if the frame is not corrupted
                 acknowledgement, _ = sock.recvfrom(1024)
                 acknowledgement = str(acknowledgement, 'utf-8')
                 print('Info : ', data)
