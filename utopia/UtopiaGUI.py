@@ -1,4 +1,5 @@
 from tkinter import *
+import threading
 from UtopiaSender import send, stop as stop_sender
 from UtopiaReceiver import receive, stop as stop_receiver
 
@@ -37,17 +38,20 @@ no_frames_entry.grid(column=1, row=2)
 data_entry = Entry(window)
 data_entry.grid(column=1, row=3)
 
+# create function to run send in a separate thread
+def send_thread():
+    send(float(timeout_entry.get()), float(sleep_entry.get()), int(no_frames_entry.get()), data_entry.get())
+
 # create button to send data
-send_button = Button(window, text="Send", command=lambda: send(
-    float(timeout_entry.get()),
-    float(sleep_entry.get()),
-    int(no_frames_entry.get()),
-    data_entry.get()
-))
+send_button = Button(window, text="Send", command=lambda: threading.Thread(target=send_thread).start())
 send_button.grid(column=1, row=4)
 
+# create function to run receive in a separate thread
+def receive_thread():
+    receive()
+
 # create button to receive data
-receive_button = Button(window, text="Receive", command=receive)
+receive_button = Button(window, text="Receive", command=lambda: threading.Thread(target=receive_thread).start())
 receive_button.grid(column=1, row=5)
 
 # create button to stop sender and receiver
