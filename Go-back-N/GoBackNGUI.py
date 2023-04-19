@@ -17,12 +17,15 @@ window.geometry('400x300')
 timeout_label = Label(window, text="TIMEOUT_INTERVAL:")
 timeout_label.grid(column=0, row=0)
 
+# create spleep labels and entry fields
 sleep_label = Label(window, text="SLEEP_INTERVAL:")
 sleep_label.grid(column=0, row=1)
 
+# create no of frames labels and entry fields
 no_frames_label = Label(window, text="No of frames to be sent:")
 no_frames_label.grid(column=0, row=2)
 
+# create data labels and entry fields
 data_label = Label(window, text="Data to be transferred:")
 data_label.grid(column=0, row=3)
 
@@ -30,12 +33,15 @@ data_label.grid(column=0, row=3)
 timeout_entry = Entry(window)
 timeout_entry.grid(column=1, row=0)
 
+# create entry fields
 sleep_entry = Entry(window)
 sleep_entry.grid(column=1, row=1)
 
+# create entry fields
 no_frames_entry = Entry(window)
 no_frames_entry.grid(column=1, row=2)
 
+# create entry fields
 data_entry = Entry(window)
 data_entry.grid(column=1, row=3)
 

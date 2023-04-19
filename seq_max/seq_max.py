@@ -1,6 +1,6 @@
 import math
 
-# Definir el número máximo de secuencia predeterminado
+# Define the maximum sequence number
 DEFAULT_MAX_SEQ = 7
 
 class Protocol:
@@ -8,19 +8,17 @@ class Protocol:
         self.max_seq = max_seq
 
     def send(self, data):
-        # Implementar la lógica de envío de datos
         pass
 
     def receive(self):
-        # Implementar la lógica de recepción de datos
         pass
 
     def set_max_seq(self, max_seq):
-        # Verificar que el número máximo de secuencia esté dentro del rango adecuado
+        # Verify that the maximum sequence number is a power of 2
         max_seq = min(max_seq, int(math.pow(2, math.ceil(math.log2(max_seq + 1))) - 1))
         self.max_seq = max_seq
 
-# Ejemplo de uso
+# Example to use the Protocol class
 p = Protocol()
 print("Número máximo de secuencia predeterminado:", p.max_seq)
 

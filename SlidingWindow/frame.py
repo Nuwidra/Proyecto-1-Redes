@@ -37,7 +37,7 @@ class Frame:
     def _deliver_packets(self):
         """
         Deliver packets to the application layer.
-        :return:
+        :return: None
         """
         while self.window[self.recv_base % self.window_size] is not None:
             packet = self.window[self.recv_base % self.window_size]

@@ -9,9 +9,10 @@ SENDER_ADDR = ('localhost', 8000)
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(RECEIVER_ADDR)
 
-
+# Receiver function is used to receive the frames from the sender.
 def receiver() :
     print(f'GoBackN Receiver', end = '', flush = True)
+    # This loop is used to receive the frames from the sender.
     while True :
         enable_network_layer() # enable the network layer
         packet_address,addr = sock.recvfrom(1024) # receive a packet from the sender

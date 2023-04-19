@@ -1,8 +1,8 @@
 import time
-
+# Timer class to implement the timer
 class Timer(object):
     TIMER_STOP = -1
-
+    # Stores the duration of the timer
     def __init__(self, duration):
         self._start_time = self.TIMER_STOP
         self._duration = duration

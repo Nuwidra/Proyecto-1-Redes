@@ -2,7 +2,7 @@ import threading
 
 from SelectiveRepeat.sender import sender, stop_sender
 from SelectiveRepeat.receiver import receiver, stop_receiver
-
+# name of the file to be sent
 if __name__ == '__main__':
     # Message to send
     data = "Hello world!"

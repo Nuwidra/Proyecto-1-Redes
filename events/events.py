@@ -1,3 +1,4 @@
+#This event waits for the time specified in the event.
 def wait_for_event(event):
     pass
 
